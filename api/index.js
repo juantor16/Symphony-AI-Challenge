@@ -1,4 +1,4 @@
-// backend/index.js
+// api/index.js
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
@@ -6,8 +6,10 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: 'https://symphony-ai-challenge.vercel.app' }));
-
+app.use(cors({
+    origin: '*'  // or specify your frontend URL, e.g., "https://symphony-ai-challenge.vercel.app"
+  }));
+  
 const PORT = 5001;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
