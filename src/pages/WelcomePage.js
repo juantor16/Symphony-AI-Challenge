@@ -1,6 +1,8 @@
 // src/pages/WelcomePage.js
 import React, { useState, useEffect } from 'react';
 import './WelcomePage.css';
+import Credits from '../components/Credits.js'; // Make sure this path is correct
+
 
 const WelcomePage = () => {
     const [userName, setUserName] = useState('');
@@ -17,11 +19,13 @@ const WelcomePage = () => {
     const [questionIndex, setQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [showNextButton, setShowNextButton] = useState(false);
-    const [showModal, setShowModal] = useState(false); // New state for modal
-    const [pharaohMatch, setPharaohMatch] = useState(null); // Store pharaoh match
-    const [personalityTraits, setPersonalityTraits] = useState([]); // Personality trait answers
+    const [showModal, setShowModal] = useState(false);
+    const [pharaohMatch, setPharaohMatch] = useState(null);
+    const [personalityTraits, setPersonalityTraits] = useState([]);
     const [traitIndex, setTraitIndex] = useState(0);
-    const [traitAnswer, setTraitAnswer] = useState(''); // State to handle text input for personality questions
+    const [traitAnswer, setTraitAnswer] = useState('');
+    const [floatStyle, setFloatStyle] = useState({});
+    const [showCredits, setShowCredits] = useState(false); // State to handle the rolling credits
 
     const personalityQuestions = [
         "What kind of leader are you? (e.g., strategic, charismatic, fearless)",
@@ -31,25 +35,39 @@ const WelcomePage = () => {
         "What's more important: being loved by your people or feared by your enemies?"
     ];
 
-    // Function to play audio
+    // Function to handle the floating effect based on mouse movement
+    const handleMouseMove = (event) => {
+        const xOffset = (event.clientX / window.innerWidth - 1) * 20;
+        const yOffset = (event.clientY / window.innerHeight - 1) * 20;
+
+        setFloatStyle({
+            transform: `translate(${xOffset}px, ${yOffset}px)`,
+        });
+    };
+
+    useEffect(() => {
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
+
     const playAudio = (audioFile) => {
         const audio = new Audio(audioFile);
         audio.volume = 0.3;
         audio.play();
     };
 
-    // Automatically play the introduction audio when the page loads
     useEffect(() => {
-        playAudio('/introduction.mp3'); // Make sure the path is correct relative to the public folder
+        playAudio('/introduction.mp3');
     }, []);
 
-    // Typing effect for the message
     useEffect(() => {
         if (messageIndex < pharaohMessage.length) {
             const timeoutId = setTimeout(() => {
                 setDisplayedMessage((prev) => prev + pharaohMessage.charAt(messageIndex));
                 setMessageIndex((prev) => prev + 1);
-            }, 50); // Speed of typing effect
+            }, 50);
             return () => clearTimeout(timeoutId);
         }
     }, [messageIndex, pharaohMessage]);
@@ -62,19 +80,18 @@ const WelcomePage = () => {
             setMessageIndex(0);
             setShowInput(false);
 
-            // Instead of changing to quiz mode immediately, just start fetching questions
             fetchAllQuestions();
         }
     };
 
     const fetchAllQuestions = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/generate-questions'); // Fetch from AI endpoint
+            const response = await fetch('http://localhost:5001/api/generate-questions');
             const data = await response.json();
 
             if (data.questions && data.questions.length > 0) {
                 setQuestionsList(data.questions);
-                setCurrentQuestion(data.questions[0]); // Set the first question
+                setCurrentQuestion(data.questions[0]);
                 setPharaohMessage('The questions have been generated! Let’s begin your challenge!');
 
                 setDisplayedMessage('');
@@ -129,7 +146,7 @@ const WelcomePage = () => {
             setShowNextButton(false);
 
             setTimeout(() => {
-                setShowModal(true); // Start the personality questions
+                setShowModal(true);
             }, 5000);
         }
     };
@@ -153,7 +170,7 @@ const WelcomePage = () => {
         if (traitAnswer.trim() !== '') {
             const updatedTraits = [...personalityTraits, traitAnswer.trim()];
             setPersonalityTraits(updatedTraits);
-            setTraitAnswer(''); // Clear input
+            setTraitAnswer('');
 
             if (traitIndex + 1 < personalityQuestions.length) {
                 setTraitIndex(traitIndex + 1);
@@ -163,12 +180,22 @@ const WelcomePage = () => {
         }
     };
 
+    // Function to handle the end of credits
+    const handleCloseCredits = () => {
+        setShowCredits(false); // Hide credits when they finish
+    };
+
+    const closeMatchModal = () => {
+        setShowModal(false);
+        setShowCredits(true); // Display the rolling credits when modal is closed
+    };
+
     return (
         <div className={`welcome-page ${isFadingOut ? 'fade-out' : 'fade-in'}`} style={{ backgroundImage: `url(${backgroundImage})` }}>
-            <div className="pharaoh-container">
+            <div className="pharaoh-container" style={floatStyle}>
                 <img src="/phairaoh.png" alt="Pharaoh" className="pharaoh-avatar" />
             </div>
-            <div className="dialogue-box">
+            <div className="dialogue-box" style={floatStyle}>
                 {!quizMode && (
                     <>
                         <p>{displayedMessage}</p>
@@ -223,11 +250,13 @@ const WelcomePage = () => {
                         ) : (
                             <div>
                                 <p>{pharaohMatch}</p>
-                                <button onClick={() => setShowModal(false)}>Close</button>
+                                <button onClick={closeMatchModal}>Close</button>
                             </div>
                         )}
                     </div>
                 )}
+
+                {showCredits && <Credits onCreditsEnd={handleCloseCredits} />}
             </div>
         </div>
     );

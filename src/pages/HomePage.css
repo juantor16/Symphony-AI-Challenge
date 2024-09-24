@@ -16,16 +16,17 @@
     border-radius: 10px;
   }
   
-  .explore-button {
-    background-color: #daa520;
-    color: white;
+  .explore-button, .credits-button {
+    margin: 1rem;
     padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+    font-size: 1em;
     cursor: pointer;
+    border: none;
+    background-color: #d4a017;
+    color: white;
     transition: background-color 0.3s ease;
   }
   
-  .explore-button:hover {
-    background-color: #b8860b;
+  .explore-button:hover, .credits-button:hover {
+    background-color: #b3860b;
   }
