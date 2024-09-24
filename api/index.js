@@ -9,9 +9,9 @@ app.use(express.json());
 app.use(cors({
     origin: '*'  // or specify your frontend URL, e.g., "https://symphony-ai-challenge.vercel.app"
   }));
-  
+
 const PORT = 5001;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY = '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';
 
 // Utility function to fetch questions with retry logic
 const fetchQuestionsWithRetry = async (retryCount = 3) => {
