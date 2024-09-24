@@ -6,13 +6,15 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: 'https://symphony-ai-challenge.vercel.app' }));
 
 const PORT = 5001;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // Utility function to fetch questions with retry logic
 const fetchQuestionsWithRetry = async (retryCount = 3) => {
+    console.log('Fetching questions from OpenAI...');
+    console.log('openapi key:', OPENAI_API_KEY)
     for (let attempt = 1; attempt <= retryCount; attempt++) {
         try {
             const response = await axios.post(
