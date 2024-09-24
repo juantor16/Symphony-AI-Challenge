@@ -86,7 +86,7 @@ const WelcomePage = () => {
 
     const fetchAllQuestions = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/generate-questions');
+            const response = await fetch('https://symphony-ai-challenge-bellffgt0-juantor16s-projects.vercel.app/api/generate-questions');
             const data = await response.json();
 
             if (data.questions && data.questions.length > 0) {
@@ -153,7 +153,7 @@ const WelcomePage = () => {
 
     const handlePharaohMatch = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/pharaoh-match', {
+            const response = await fetch('https://symphony-ai-challenge-bellffgt0-juantor16s-projects.vercel.app/api/pharaoh-match', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ personalityTraits })

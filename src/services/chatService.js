@@ -2,7 +2,7 @@
 export const sendMessageToPharaoh = async (userMessage) => {
     try {
         console.log("OpenAI API Key:", process.env.OPENAI_API_KEY);
-        const response = await fetch('http://localhost:5001/api/chat', { // Ensure the correct port
+        const response = await fetch('https://symphony-ai-challenge-bellffgt0-juantor16s-projects.vercel.app/api/chat', { // Ensure the correct port
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
