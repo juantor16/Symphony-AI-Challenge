@@ -11,7 +11,7 @@ app.use(cors({
   }));
 
 const PORT = 5001;
-const OPENAI_API_KEY = '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';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // Utility function to fetch questions with retry logic
 const fetchQuestionsWithRetry = async (retryCount = 3) => {
