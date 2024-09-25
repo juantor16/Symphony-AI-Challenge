@@ -15,6 +15,10 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 // Utility function to fetch questions with retry logic
 const fetchQuestionsWithRetry = async (retryCount = 3) => {
+    console.log('Fetching questions from OpenAI...');
+    console.log('API Key:', OPENAI_API_KEY);
+    const promptContent = "Generate a list of 5 questions about ancient Egypt in a format with options A, B, C, and D, followed by the correct answer and explanation.";
+
     for (let attempt = 1; attempt <= retryCount; attempt++) {
         try {
             const response = await axios.post(
@@ -24,10 +28,10 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
                     messages: [
                         {
                             role: 'system',
-                            content: "Generate a list of 7 questions about ancient Egypt in a format with options A, B, C, and D, followed by the correct answer and explanation."
+                            content: promptContent
                         }
                     ],
-                    max_tokens: 800,
+                    max_tokens: 800,  // This should be less than 4096 minus the input tokens
                     temperature: 0.7
                 },
                 {
@@ -38,31 +42,56 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
                 }
             );
 
-            const aiQuestions = response.data.choices[0].message.content.split("\n\n").map(q => {
-                const parts = q.split('\n');
-                const mainQuestion = parts[0].replace('Question: ', '');
-                const options = parts.slice(1, 5).map(opt => opt.slice(3)); // Extract options A), B), etc.
-                const correctAnswer = parts[5].replace('Correct Answer: ', '').trim();
-                const explanation = parts[6].replace('Explanation: ', '').trim();
+            // Check if there's a valid response
+            if (response.data.choices && response.data.choices[0] && response.data.choices[0].message.content) {
+                const aiContent = response.data.choices[0].message.content;
+                console.log("AI Response Content:", aiContent);
 
-                return {
-                    question: mainQuestion,
-                    options: options,
-                    correctAnswer: correctAnswer,
-                    explanation: explanation
-                };
-            });
+                // Validate and split the response properly
+                const aiQuestions = aiContent.split("\n\n").map(q => {
+                    const parts = q.split('\n');
+                    if (parts.length < 7) {
+                        console.error(`Unexpected question format in: ${q}`);
+                        return null;
+                    }
+                    const mainQuestion = parts[0].replace('Question: ', '').trim();
+                    const options = parts.slice(1, 5).map(opt => opt.slice(3).trim()); // Extract options A), B), etc.
+                    const correctAnswer = parts[5].replace('Correct Answer: ', '').trim();
+                    const explanation = parts[6].replace('Explanation: ', '').trim();
 
-            return { success: true, questions: aiQuestions };
+                    return {
+                        question: mainQuestion,
+                        options: options,
+                        correctAnswer: correctAnswer,
+                        explanation: explanation
+                    };
+                }).filter(q => q !== null); // Filter out any null entries caused by unexpected formats
+
+                if (aiQuestions.length > 0) {
+                    return { success: true, questions: aiQuestions };
+                } else {
+                    throw new Error('Failed to parse questions from the AI response');
+                }
+            } else {
+                throw new Error('Unexpected response format from OpenAI');
+            }
         } catch (error) {
             console.error(`Attempt ${attempt} failed:`, error.response ? error.response.data : error.message);
 
-            // If we've reached the max retry count, return the failure
+            // Log more details if available
+            if (error.response) {
+                console.error(`Status: ${error.response.status}`);
+                console.error(`Headers: ${JSON.stringify(error.response.headers)}`);
+                console.error(`Data: ${JSON.stringify(error.response.data)}`);
+            } else {
+                console.error(`Error Message: ${error.message}`);
+            }
+
             if (attempt === retryCount) {
                 return { success: false, error: 'Failed to fetch questions from OpenAI after multiple attempts' };
             }
 
-            // Wait a bit before retrying (e.g., 1 second)
+            // Wait a bit before retrying
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
