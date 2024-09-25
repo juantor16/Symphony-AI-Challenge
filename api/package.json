@@ -15,5 +15,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "openai": "^4.63.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

@@ -10,12 +10,12 @@ const WelcomePage = () => {
     const [displayedMessage, setDisplayedMessage] = useState('');
     const [showInput, setShowInput] = useState(true);
     const [messageIndex, setMessageIndex] = useState(0);
-    const [isFadingOut, setIsFadingOut] = useState(false);
-    const [backgroundImage, setBackgroundImage] = useState('../assets/pharaohBackground.png');
+    const [isFadingOut] = useState(false);
+    const [backgroundImage] = useState('../assets/pharaohBackground.png');
     const [quizMode, setQuizMode] = useState(false);
     const [questionsList, setQuestionsList] = useState([]); // Store all questions
     const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [userAnswer, setUserAnswer] = useState('');
+    const [setUserAnswer] = useState('');
     const [questionIndex, setQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [showNextButton, setShowNextButton] = useState(false);
