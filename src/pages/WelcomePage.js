@@ -110,7 +110,10 @@ const WelcomePage = () => {
         }
     };
 
+    // Ensure that this function is properly defined
     const handleAnswerSubmit = (selectedOption) => {
+        console.log("Selected option:", selectedOption); // Add this line to debug
+        console.log("Current question:", currentQuestion); // Check if the current question is defined
         if (selectedOption) {
             if (selectedOption === currentQuestion.correctAnswer.split(' ').slice(1).join(' ')) {
                 setPharaohMessage(`Well done, ${userName}! That is correct! ${currentQuestion.explanation}`);
@@ -120,9 +123,8 @@ const WelcomePage = () => {
             }
             setDisplayedMessage('');
             setMessageIndex(0);
-            setUserAnswer('');
             setQuizMode(false);
-
+    
             setTimeout(() => {
                 setShowNextButton(true);
             }, 5000);
@@ -219,7 +221,7 @@ const WelcomePage = () => {
                         {currentQuestion.options.map((option, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleAnswerSubmit(option)}
+                                onClick={() => handleAnswerSubmit(option)}  // Make sure this line is correctly calling handleAnswerSubmit
                                 style={{ margin: '5px', padding: '5px 10px' }}
                             >
                                 {option}
