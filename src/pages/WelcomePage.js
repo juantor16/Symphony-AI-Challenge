@@ -15,7 +15,6 @@ const WelcomePage = () => {
     const [quizMode, setQuizMode] = useState(false);
     const [questionsList, setQuestionsList] = useState([]); // Store all questions
     const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [setUserAnswer] = useState('');
     const [questionIndex, setQuestionIndex] = useState(0);
     const [score, setScore] = useState(0);
     const [showNextButton, setShowNextButton] = useState(false);
