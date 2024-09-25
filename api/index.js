@@ -15,8 +15,6 @@ const OPENAI_API_KEY = 'sk-proj-TsQdl9FwGTqBm0TotMjlVHocO50J8-jKG3aSdkE69N76m1ji
 
 // Utility function to fetch questions with retry logic
 const fetchQuestionsWithRetry = async (retryCount = 3) => {
-    console.log('Fetching questions from OpenAI...');
-    console.log('openapi key:', OPENAI_API_KEY)
     for (let attempt = 1; attempt <= retryCount; attempt++) {
         try {
             const response = await axios.post(
@@ -72,6 +70,8 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
 
 // Endpoint to fetch all questions using the retry logic
 app.get('/api/generate-questions', async (req, res) => {
+    console.log('Fetching questions from OpenAI...');
+    console.log('openapi key:', OPENAI_API_KEY)
     const result = await fetchQuestionsWithRetry();
 
     if (result.success) {
