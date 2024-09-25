@@ -153,7 +153,7 @@ const WelcomePage = () => {
 
     const handlePharaohMatch = async () => {
         try {
-            const response = await fetch('https://symphony-ai-challenge.vercel.app/api/generate-questions', {
+            const response = await fetch('https://symphony-ai-challenge.vercel.app/api/pharaoh-match', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ personalityTraits })
