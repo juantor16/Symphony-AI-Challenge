@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
     origin: '*',  // You can specify your frontend URL if needed, e.g., "https://symphony-ai-challenge.vercel.app"
-  }));
+}));
 
 const PORT = 5001;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -21,6 +21,8 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
 
     for (let attempt = 1; attempt <= retryCount; attempt++) {
         try {
+            const startTime = Date.now(); // Start time to measure API request duration
+
             const response = await axios.post(
                 'https://api.openai.com/v1/chat/completions',
                 {
@@ -31,7 +33,7 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
                             content: promptContent
                         }
                     ],
-                    max_tokens: 800,  // This should be less than 4096 minus the input tokens
+                    max_tokens: 500,  // Reduced from 800 to handle potential long response issues
                     temperature: 0.7
                 },
                 {
@@ -41,6 +43,9 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
                     },
                 }
             );
+
+            const endTime = Date.now(); // End time
+            console.log(`OpenAI API call took ${endTime - startTime} ms`); // Log the duration
 
             // Check if there's a valid response
             if (response.data.choices && response.data.choices[0] && response.data.choices[0].message.content) {
@@ -91,7 +96,7 @@ const fetchQuestionsWithRetry = async (retryCount = 3) => {
                 return { success: false, error: 'Failed to fetch questions from OpenAI after multiple attempts' };
             }
 
-            // Wait a bit before retrying
+            // Wait a bit before retrying (e.g., 1 second)
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
@@ -143,10 +148,20 @@ app.post('/api/pharaoh-match', async (req, res) => {
         res.json({ match: matchDescription });
     } catch (error) {
         console.error('Error generating match:', error);
+
+        // Log error details for better troubleshooting
+        if (error.response) {
+            console.error(`Status: ${error.response.status}`);
+            console.error(`Headers: ${JSON.stringify(error.response.headers)}`);
+            console.error(`Data: ${JSON.stringify(error.response.data)}`);
+        }
+
         res.status(500).json({ error: 'Could not generate a pharaoh match' });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+// Listen to the environment port provided by Vercel, otherwise use the default 5001 port
+const port = process.env.PORT || PORT;
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
 });
