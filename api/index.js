@@ -7,7 +7,7 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: '*'  // or specify your frontend URL, e.g., "https://symphony-ai-challenge.vercel.app"
+    origin: '*',  // You can specify your frontend URL if needed, e.g., "https://symphony-ai-challenge.vercel.app"
   }));
 
 const PORT = 5001;
